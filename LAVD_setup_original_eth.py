@@ -413,7 +413,7 @@ def vorticity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, period
 
          omega[:,i] = np.array([dwdy-dvdz, dudz-dwdx, dvdx-dudy])
                 
-    return omega, np.array([vRend, vLend, vUend, vDend, vFend, vBend]), X0
+    return omega
 
 
 def gradient_flowmap(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, aux_grid, verbose = False):
