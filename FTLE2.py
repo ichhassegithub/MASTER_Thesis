@@ -146,7 +146,7 @@ lenT = abs(tN-t0) #
 
 def compute_FTLE(x0, y0, z0):
     '''
-    compute_FTLE computes the ftle file shape(Nx, Ny), test_iteration
+    compute_FTLE computes the ftle file shape(Nx, Ny)
     '''
     
     X0 = np.array([x0, y0, z0]) # array (3, Nx*Ny*Nz)
