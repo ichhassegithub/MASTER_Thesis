@@ -4,14 +4,12 @@
 Created on Tue Oct 29 15:38:22 2024
 
 @author: sarahvalent
+function collection for the toymountain set up
 """
 
 import numpy as np
-from scipy.interpolate import RegularGridInterpolator, interp1d
-from scipy.ndimage import gaussian_filter
-from scipy.linalg import eigh
+from scipy.interpolate import RegularGridInterpolator
 import netCDF4 as nc
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numpy.linalg import svd
@@ -35,34 +33,6 @@ def reorder_velocity(u, v, w):
     return u_reordered, v_reordered, w_reordered
 
 
-def interpolant(X, Y, Z, U, V, W, time, interpolation_method = 'linear'):
-    '''
-    Unsteady wrapper for scipy.interpolate.RegularGridInterpolator. Creates a list of interpolators for u, v and w velocities
-    
-    Parameters:
-        X: array (Ny, Nx, Nz), X-meshgrid
-        Y: array (Ny, Nx, Nz), Y-meshgrid
-        Z: array (Ny, Nx, Nz), Y-meshgrid
-        U: array (Ny, Nx, Nz, Nt), U velocity
-        V: array (Ny, Nx, Nz, Nt), V velocity
-        W: array (Ny, Nx, Nz, Nt), W velocity
-        time: array(1, Nt), time array
-        interpolation_method: Method for interpolation. Scipy default is 'linear', can be 'nearest'
-    
-    Returns:
-        Interpolant: list (3,), U, V and W interpolators
-    '''
-    Interpolant = []
-    
-    Interpolant.append(RegularGridInterpolator((Y[:,0,0], X[0,:,0], Z[0,0,:], time[:]), U,
-                                               bounds_error = False, fill_value = np.nan, method = interpolation_method))
-    Interpolant.append(RegularGridInterpolator((Y[:,0,0], X[0,:,0], Z[0,0,:], time[:]), V,
-                                               bounds_error = False, fill_value = np.nan, method = interpolation_method))
-    Interpolant.append(RegularGridInterpolator((Y[:,0,0], X[0,:,0], Z[0,0,:], time[:]), W,
-                                               bounds_error = False, fill_value = np.nan, method = interpolation_method))               
-        
-    return Interpolant
-
 def interpolant_unsteady(X, Y, Z, U, V, W, time, interpolation_method = 'linear'):
     '''
     Unsteady wrapper for scipy.interpolate.RegularGridInterpolator. Creates a list of interpolators for u, v and w velocities
@@ -75,8 +45,7 @@ def interpolant_unsteady(X, Y, Z, U, V, W, time, interpolation_method = 'linear'
         V: array (Ny, Nx, Nz, Nt), V velocity
         W: array (Ny, Nx, Nz, Nt), W velocity
         time: array(1, Nt), time array
-        interpolation_method: Method for interpolation. Scipy default is 'linear', can be 'nearest'
-    
+
     Returns:
         Interpolant: list (3,), U, V and W interpolators
     '''
@@ -92,7 +61,7 @@ def interpolant_unsteady(X, Y, Z, U, V, W, time, interpolation_method = 'linear'
     return Interpolant
 
 
-def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, verbose = False):
+def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady):
     '''
     Wrapper for RK4_step(). Advances the flow field given by u, v, w velocities, starting from given initial conditions. 
     The initial conditions can be specified as an array. 
@@ -108,7 +77,7 @@ def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant
         Interpolant_w: Interpolant object for w(x, t)
         periodic: list of 3 bools, periodic[i] is True if the flow is periodic in the ith coordinate.
         bool_unsteady:  specifies if velocity field is unsteady/steady
-        verbose: bool, if True, function reports progress
+        
     
     Returns:
         Fmap: array (Nt, 3, Npoints), integrated trajectory (=flow map)
@@ -130,13 +99,8 @@ def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant
     Fmap[counter,:,:] = x
     
     # Runge Kutta 4th order integration with fixed step size dt
-    for t in time[:-1]:
-        if verbose == True:
-            if np.around((t-time[0])/(time[-1]-time[0])*1000,4)%10 == 0:
-                print('Percentage completed: ', np.around(np.around((t-time[0])/(time[-1]-time[0]), 4)*100, 2))
-        
+    for t in time[:-1]: 
         Fmap[counter+1,:, :], dFdt[counter,:,:] = RK4_step(t, Fmap[counter,:, :], dt, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady)[:2]
-    
         counter += 1
     
     return Fmap, dFdt
@@ -228,46 +192,22 @@ def velocity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodi
         Interpolant_u: Interpolant object for u(x, t)
         Interpolant_v: Interpolant object for v(x, t)
         Interpolant_w: Interpolant object for w(x, t)
-        periodic: list of 3 bools, periodic[i] is True if the flow is periodic in the ith coordinate.
-        bool_unsteady:  specifies if velocity field is unsteady/steady
+        in this code i decided to not use periodic or bool_únsteady becaus i make sure that the time is 
+        already included and we only have non-periodic flows
     
     Returns:
 
         vel = [u, v, w]: concatenated velocityies, same shape as x
     '''
-    x_swap = np.zeros((x.shape[1], x.shape[0]))
+    x_swap = np.zeros((x.shape[1], 4))
     x_swap[:,0] = x[1,:]
     x_swap[:,1] = x[0,:]
     x_swap[:,2] = x[2,:] 
+    x_swap[:,3] = t
     
-    # check if periodic in x
-    if periodic[0]:
-        
-        x_swap[:,1] = (x[0,:]-X[0, 0, 0])%(X[0, -1, 0]-X[0, 0, 0])+X[0, 0, 0]
-
-    
-    # check if periodic in y
-    if periodic[1]:
-        
-        x_swap[:,0] = (x[1,:]-Y[0, 0, 0])%(Y[-1, 0, 0]-Y[0, 0, 0])+Y[0, 0, 0]
-    
-    # check if periodic in z
-    if periodic[2]:
-        
-        x_swap[:,2] = (x[2,:]-Z[0, 0, 0])%(Z[0, 0, -1]-Z[0, 0, 0])+Z[0, 0, 0]
-        
-        
-    if bool_unsteady:
-    
-        u = Interpolant_u(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-        v = Interpolant_v(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-        w = Interpolant_w(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-    
-    else:
-               
-        u = Interpolant_u(x_swap)
-        v = Interpolant_v(x_swap)
-        w = Interpolant_w(x_swap)
+    u = Interpolant_u(x_swap)
+    v = Interpolant_v(x_swap)
+    w = Interpolant_w(x_swap)
     
     vel = np.array([u, v, w])
     
