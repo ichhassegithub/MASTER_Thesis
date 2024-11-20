@@ -63,7 +63,7 @@ periodic_x = False
 periodic_y = False
 periodic_z = False
 periodic = [periodic_x, periodic_y, periodic_z]
-bool_unsteady = True
+bool_unsteady = False
 ## defining original meshgrid 
 X,Y,Z = np.meshgrid(x,y,zu_3d)
 dx_data = X[0,1,0]-X[0,0,0] 
