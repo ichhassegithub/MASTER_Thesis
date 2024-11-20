@@ -16,7 +16,23 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numpy.linalg import svd
 
+def reorder_velocity(u, v, w):
+    """
+    Parameters:
+    u (ndarray): u vector with shape (time, z, y, x).
+    v (ndarray): v vector with shape (time, z, y, x).
+    w (ndarray): w vector with shape (time, z, y, x).
 
+    Returns:
+    tuple: Reordered u, v, w vectors with shape (y, x, z, t).
+    """
+
+   
+    u_reordered = np.transpose(u, (2, 3, 1, 0))  
+    v_reordered = np.transpose(v, (2, 3, 1, 0))
+    w_reordered = np.transpose(w, (2, 3, 1, 0))
+  
+    return u_reordered, v_reordered, w_reordered
 
 
 def interpolant(X, Y, Z, U, V, W, time, interpolation_method = 'linear'):
