@@ -274,76 +274,6 @@ def velocity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodi
     return vel
 
 
-# def velocity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady):
-#     '''
-#     Evaluate the interpolated velocity field over the specified spatial locations at the specified time.
-    
-#     Parameters:
-#         t: array (N,),  time array  
-#         x: array (3,Npoints),  array of ICs
-#         X: array (NY, NX, NZ)  X-meshgrid
-#         Y: array (NY, NX, NZ)  Y-meshgrid 
-#         Z: array (NY, NX, NZ)  Z-meshgrid
-#         Interpolant_u: Interpolant object for u(x, t)
-#         Interpolant_v: Interpolant object for v(x, t)
-#         Interpolant_w: Interpolant object for w(x, t)
-#         periodic: list of 3 bools, periodic[i] is True if the flow is periodic in the ith coordinate.
-#         bool_unsteady:  specifies if velocity field is unsteady/steady
-    
-#     Returns:
-
-#         vel = [u, v, w]: concatenated velocityies, same shape as x
-#     '''
-#     x_swap = np.zeros((x.shape[1], 4))
-#     x_swap[:,0] = x[1,:]
-#     x_swap[:,1] = x[0,:]
-#     x_swap[:,2] = x[2,:] 
-#     x_swap[:,3] = t
-    
-#     # check if periodic in x
-#     if periodic[0]:
-        
-#         x_swap[:,1] = (x[0,:]-X[0, 0, 0])%(X[0, -1, 0]-X[0, 0, 0])+X[0, 0, 0]
-
-    
-#     # check if periodic in y
-#     if periodic[1]:
-        
-#         x_swap[:,0] = (x[1,:]-Y[0, 0, 0])%(Y[-1, 0, 0]-Y[0, 0, 0])+Y[0, 0, 0]
-    
-#     # check if periodic in z
-#     if periodic[2]:
-        
-#         x_swap[:,2] = (x[2,:]-Z[0, 0, 0])%(Z[0, 0, -1]-Z[0, 0, 0])+Z[0, 0, 0]
-        
-        
-#     # if bool_unsteady:
-    
-#     #     u = Interpolant_u(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-#     #     v = Interpolant_v(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-#     #     w = Interpolant_w(np.append(x_swap, t*np.ones((x_swap.shape[0], 1)), axis = 1))
-#     if bool_unsteady:
-#         # For unsteady flow, append time to the input array
-#         time_input = np.full((x_swap.shape[0], 1), t)  # Create a column vector of the same time for all points
-#         x_swap_time = np.hstack((x_swap[:, :3], time_input))  # Concatenate spatial and time inputs
-
-#         # Interpolate using the interpolants
-#         u = Interpolant_u(x_swap_time)
-#         v = Interpolant_v(x_swap_time)
-#         w = Interpolant_w(x_swap_time)
-    
-#     else:
-               
-#         u = Interpolant_u(x_swap)
-#         v = Interpolant_v(x_swap)
-#         w = Interpolant_w(x_swap)
-    
-#     vel = np.array([u, v, w])
-    
-#     return vel
-
-
-
 
 def LAVD(omega, times, omega_avg = None):
     ''' 
@@ -548,9 +478,9 @@ def gradient_flowmap(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant
     XFend = integration_dFdt(time, XF, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, verbose)[0] # array (Nt, 2)
     XBend = integration_dFdt(time, XB, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, verbose)[0] # array (Nt, 2)
     
-    iteration = iterate_gradient(XRend, XLend, XUend, XDend, XFend, XBend)
+   
     
-    return iteration
+    return iterate_gradient(XRend, XLend, XUend, XDend, XFend, XBend)
 
 from numba import njit, prange
 @njit(parallel = True)
