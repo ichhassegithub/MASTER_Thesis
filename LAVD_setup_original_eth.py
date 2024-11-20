@@ -550,7 +550,7 @@ def gradient_flowmap(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant
     
     iteration = iterate_gradient(XRend, XLend, XUend, XDend, XFend, XBend)
     
-    return iteration, np.array([XRend, XLend, XUend, XDend, XFend, XBend])
+    return iteration
 
 from numba import njit, prange
 @njit(parallel = True)
