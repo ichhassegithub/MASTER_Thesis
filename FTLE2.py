@@ -4,21 +4,17 @@
 Created on Mon Oct 28 12:40:19 2024
 
 @author: sarahvalent
+FTLE -  Finite-Time Lyapunov Exponent for turbulent flow around toy mountain
 """
 
+### libraries
 import numpy as np
-from scipy.interpolate import RegularGridInterpolator, interp1d
-from scipy.ndimage import gaussian_filter
-from scipy.linalg import eigh
+from scipy.interpolate import RegularGridInterpolator
 import netCDF4 as nc
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
-from FTLE_setupfunctions import *
 from LAVD_setup_original_eth import *
-from tqdm import tqdm
-from plotly import graph_objs as go 
 
-#nc_file = '/Users/sarahvalent/Desktop/MASTER-THESIS/SHARED FOLDER/toy_mountain_noncyclic_100m_3d.001.nc'
+# data of toymountain - 100m x 100m 
 nc_file = '/Users/sarahvalent/Downloads/toy_mountain_noncyclic_100m_3d.005.nc'
 data = nc.Dataset(nc_file, 'r')
 
