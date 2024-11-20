@@ -11,7 +11,7 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 import netCDF4 as nc
 import matplotlib.pyplot as plt
-from LAVD_setup_original_eth import *
+from Setup_toymountain import *
 
 # data of toymountain - 100m x 100m 
 nc_file = '/Users/sarahvalent/Downloads/toy_mountain_noncyclic_100m_3d.005.nc'
