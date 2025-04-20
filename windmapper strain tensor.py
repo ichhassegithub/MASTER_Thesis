@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec  9 14:48:54 2024
 
+"""
 @author: sarahvalent
+
+Strain tensor with WindMapper files
 """
 
 import rasterio
@@ -12,22 +11,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  
 from scipy.interpolate import RegularGridInterpolator
 
-
-# file_u = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_U.tif'
-# file_v = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_V.tif'
-# file_speed_up = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_spd_up_tile.tif'
-# topography = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj.tif'
-
-# file_u = '//Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_50/ref-DEM-proj_315_U.tif'
-# file_v = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_50/ref-DEM-proj_315_V.tif'
-# file_speed_up = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_50/ref-DEM-proj_315_spd_up_tile.tif'
-# topography = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_50/ref-DEM-proj.tif'
-
-
-# file_u = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_100/ref-DEM-proj_90_U.tif'
-# file_v = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_100/ref-DEM-proj_90_V.tif'
-# file_speed_up = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_100/ref-DEM-proj_90_spd_up_tile.tif'
-# topography = '/Users/sarahvalent/Desktop/MASTER-THESIS/WINDMAPPER/windmapper_2/wm_100/ref-DEM-proj.tif'
+# for example
+# file_u = 'WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_U.tif'
+# file_v = 'WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_V.tif'
+# file_speed_up = 'MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj_0_spd_up_tile.tif'
+# topography = 'MASTER-THESIS/WINDMAPPER/windmapper_2/wm_10/ref-DEM-proj.tif'
 
 
 
