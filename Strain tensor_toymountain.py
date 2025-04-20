@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
-Created on Tue Nov 12 13:40:06 2024
 
 @author: sarahvalent
  Eulerian rate-of-strain tensor for toy mountain 100m x 100m
+ PALM output is a 4dim velocity field
+ CODE is not used in the master thesis
 """
 
 
