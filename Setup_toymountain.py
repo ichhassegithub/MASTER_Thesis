@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+-
 """
-Created on Tue Oct 29 15:38:22 2024
-
 @author: sarahvalent
 function collection for the toymountain set up
 """
@@ -15,16 +12,6 @@ from tqdm import tqdm
 from numpy.linalg import svd
 
 def reorder_velocity(u, v, w):
-    """
-    Parameters:
-    u (ndarray): u vector with shape (time, z, y, x).
-    v (ndarray): v vector with shape (time, z, y, x).
-    w (ndarray): w vector with shape (time, z, y, x).
-
-    Returns:
-    tuple: Reordered u, v, w vectors with shape (y, x, z, t).
-    """
-
    
     u_reordered = np.transpose(u, (2, 3, 1, 0))  
     v_reordered = np.transpose(v, (2, 3, 1, 0))
@@ -34,21 +21,7 @@ def reorder_velocity(u, v, w):
 
 
 def interpolant_unsteady(X, Y, Z, U, V, W, time, interpolation_method = 'linear'):
-    '''
-    Unsteady wrapper for scipy.interpolate.RegularGridInterpolator. Creates a list of interpolators for u, v and w velocities
-    
-    Parameters:
-        X: array (Ny, Nx, Nz), X-meshgrid
-        Y: array (Ny, Nx, Nz), Y-meshgrid
-        Z: array (Ny, Nx, Nz), Y-meshgrid
-        U: array (Ny, Nx, Nz, Nt), U velocity
-        V: array (Ny, Nx, Nz, Nt), V velocity
-        W: array (Ny, Nx, Nz, Nt), W velocity
-        time: array(1, Nt), time array
-
-    Returns:
-        Interpolant: list (3,), U, V and W interpolators
-    '''
+   
     Interpolant = []
     
     Interpolant.append(RegularGridInterpolator((Y[:,0,0], X[0,:,0], Z[0,0,:], time[0,:]), U,
@@ -62,27 +35,7 @@ def interpolant_unsteady(X, Y, Z, U, V, W, time, interpolation_method = 'linear'
 
 
 def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady):
-    '''
-    Wrapper for RK4_step(). Advances the flow field given by u, v, w velocities, starting from given initial conditions. 
-    The initial conditions can be specified as an array. 
     
-    Parameters:
-        time: array (Nt,),  time array  
-        x: array (3, Npoints),  array of ICs
-        X: array (NY, NX, NZ)  X-meshgrid
-        Y: array (NY, NX, NZ)  Y-meshgrid 
-        Z: array (NY, NX, NZ)  Z-meshgrid
-        Interpolant_u: Interpolant object for u(x, t)
-        Interpolant_v: Interpolant object for v(x, t)
-        Interpolant_w: Interpolant object for w(x, t)
-        periodic: list of 3 bools, periodic[i] is True if the flow is periodic in the ith coordinate.
-        bool_unsteady:  specifies if velocity field is unsteady/steady
-        
-    
-    Returns:
-        Fmap: array (Nt, 3, Npoints), integrated trajectory (=flow map)
-        dFdt: array (Nt-1, 3, Npoints), velocity along trajectories (=time derivative of flow map) 
-    '''
     # reshape x
     x = x.reshape(3, -1) # reshape array (3, Nx*Ny*Nz)
     
@@ -106,27 +59,7 @@ def integration_dFdt(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant
     return Fmap, dFdt
 
 def RK4_step(t, x1, dt, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady):
-    '''
-    Advances the flow field by a single step given by u, v, w velocities, starting from given initial conditions. 
-    The initial conditions can be specified as an array. 
     
-    Parameters:
-        time: array (Nt,),  time array  
-        x: array (3,Npoints),  array of ICs
-        X: array (NY, NX, NZ)  X-meshgrid
-        Y: array (NY, NX, NZ)  Y-meshgrid 
-        Z: array (NY, NX, NZ)  Z-meshgrid
-        Interpolant_u: Interpolant object for u(x, t)
-        Interpolant_v: Interpolant object for v(x, t)
-        Interpolant_w: Interpolant object for w(x, t)
-        periodic: list of 3 bools, periodic[i] is True if the flow is periodic in the ith coordinate.
-        bool_unsteady:  specifies if velocity field is unsteady/steady
-    
-    Returns:
-
-        y_update: array (3,Npoints), integrated trajectory (=flow map) 
-        y_prime_update: array (3,Npoints), velocity along trajectories (=time derivative of flow map) 
-    '''
     t0 = t # float
     
     # Compute x_prime at the beginning of the time-step by re-orienting and rescaling the vector field
@@ -180,25 +113,7 @@ def RK4_step(t, x1, dt, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, pe
     return y_update, y_prime_update/dt
 
 def velocity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady):
-    '''
-    Evaluate the interpolated velocity field over the specified spatial locations at the specified time.
-    
-    Parameters:
-        t: array (N,),  time array  
-        x: array (3,Npoints),  array of ICs
-        X: array (NY, NX, NZ)  X-meshgrid
-        Y: array (NY, NX, NZ)  Y-meshgrid 
-        Z: array (NY, NX, NZ)  Z-meshgrid
-        Interpolant_u: Interpolant object for u(x, t)
-        Interpolant_v: Interpolant object for v(x, t)
-        Interpolant_w: Interpolant object for w(x, t)
-        in this code i decided to not use periodic or bool_únsteady becaus i make sure that the time is 
-        already included and we only have non-periodic flows
-    
-    Returns:
-
-        vel = [u, v, w]: concatenated velocityies, same shape as x
-    '''
+   
     x_swap = np.zeros((x.shape[1], 4))
     x_swap[:,0] = x[1,:]
     x_swap[:,1] = x[0,:]
@@ -216,19 +131,6 @@ def velocity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodi
 
 
 def LAVD(omega, times, omega_avg = None):
-    ''' 
-    The Lagrangian Averaged Vorticity Deviation (LAVD) is computed from the vorticity with the trapezoid rule.
-    Integrate the absolute deviation of the vorticity from its spatial mean along trajectories
-    and divide by the length of the time interval.
-    
-    Parameters:
-        omega: array(Nt, 3, Npoints), the vorticity vector computed along trajectories
-        times: array(Nt, ), time array. Uniform spacing is assumed
-        omega_avg: array(Nt,), spatial average of the vorticity for each time instant
-        
-    Returns:
-        LAVD: array(Npoints,), integrated |\omega - average(\omega)| / t_N - t_0, the LAVD field
-    '''
     
     omega = omega.reshape((omega.shape[0], 3, -1))
     lenT = times[-1] - times[0] # calculate length of time interval
@@ -258,26 +160,7 @@ def LAVD(omega, times, omega_avg = None):
     return LAVD / lenT
 
 def vorticity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, aux_grid):
-    '''This function computes the vorticity (curl (v)) from the given interpolants by finite differencing on an auxiliary grid.
-
-    Parameters:
-        t: float, time
-        x: array (3,Npoints),  vector of positions
-        X: array (Ny, Nx, Nz), X-meshgrid
-        Y: array (Ny, Nx, Nz), Y-meshgrid
-        Z: array (Ny, Nx, Nz), Y-meshgrid
-        Interpolant_u: Interpolant object for u(x,t)
-        Interpolant_v: Interpolant object for v(x,t)
-        Interpolant_w: Interpolant object for w(x,t)
-        periodic: list (3,), periodic[0]: periodicity in x
-                             periodic[1]: periodicity in y
-                             periodic[2]: periodicity in z
-        bool_unsteady: bool, specifies if velocity field is unsteady/steady
-        aux_grid: list(3,), discrete steps for the auxiliary grid 
-        
-    Returns:
-        omega: array (3, Npoints),  Vorticity of the velocity field 
-    '''
+    
         
     x = x.reshape(3,-1)
     
@@ -357,29 +240,7 @@ def vorticity(t, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, period
 
 
 def gradient_flowmap(time, x, X, Y, Z, Interpolant_u, Interpolant_v, Interpolant_w, periodic, bool_unsteady, aux_grid, verbose = False):
-    '''
-    Calculates the gradient of the flowmap for a flow given by u, v, w velocities, starting from given initial conditions. 
-    The initial conditions can be specified as an array. 
     
-    Parameters:
-        time: array (Nt,),  time array  
-        x: array (3, Npoints),  array of ICs
-        X: array (NY, NX, NZ)  X-meshgrid
-        Y: array (NY, NX, NZ)  Y-meshgrid 
-        Z: array (NY, NX, NZ)  Z-meshgrid
-        Interpolant_u: Interpolant object for u(x, t)
-        Interpolant_v: Interpolant object for v(x, t)
-        Interpolant_w: Interpolant object for w(x, t)
-        periodic: list of 4 bools, periodic[i] is True if the flow is periodic in the ith coordinate. Time is i=4.
-        bool_unsteady:  specifies if velocity field is unsteady/steady
-        aux_grid: array(3,), grid spacing for the auxiliary grid 
-        verbose: if True plot percentage of integration done
-        
-    Returns:
-        gradFmap: array(Nt, 3, 3, Npoints), gradient of the flowmap (3 by 3 matrix) for each time instant and each spatial point
-    '''
-    
-
     # define auxiliary grid spacing
     rho_x = aux_grid[0]
     rho_y = aux_grid[1]
@@ -450,16 +311,7 @@ def iterate_gradient(XRend, XLend, XUend, XDend, XFend, XBend):
     return gradFmap
 
 def FTLE(gradFmap, lenT):
-    '''
-    Calculate the Finite Time Lyapunov Exponent (FTLE) given the gradient of the flow map over an interval [t_0, t_N].
-    
-    Parameters:
-        gradFmap: array(3, 3), flowmap gradient (3 by 3 matrix)
-        lenT: float, the length of the time-interval |t_N - t_0|
-        
-    Returns:
-        FTLE, float, FTLE value
-    '''
+   
     # compute maximum singular value of deformation gradient
     sigma_max = SVD(gradFmap)[1][0,0] # float
     
@@ -473,16 +325,7 @@ def FTLE(gradFmap, lenT):
 
 
 def SVD(gradFmap):
-    '''Wrapper for numpy.linalg.svd. For an arbitrary matrix F, decomposite as F = P \Sigma Q^T. 
-    
-    Parameters:
-        gradFmap: array (3,3) arbitrary 3 by 3 matrix
-    
-    Returns:
-        P: orthogonal rotation tensor
-        Sig: array(3,3) diagonal matrix of singular values
-        Q: orthogonal rotation tensor
-    '''
+   
     P, s, QT = svd(gradFmap)
     Q = QT.transpose()
     SIG = np.diag(s)
