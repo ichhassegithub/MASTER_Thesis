@@ -46,8 +46,8 @@ class WindAnalysis:
             import netCDF4 as nc
             dataset = nc.Dataset(nc_file, 'r')
 
-            u_data = dataset.variables['u'][-1, 1, :, :]
-            v_data = dataset.variables['v'][-1, 1, :, :]
+            u_data = np.mean(dataset.variables['u'][:, 1, :, :], axis=0)
+            v_data = np.mean(dataset.variables['v'][:, 1, :, :], axis=0)
             grid_size = 20  # 20m resolution per grid cell
             x_coords = np.linspace(0, grid_size * (u_data.shape[1] - 1), u_data.shape[1])
             y_coords = np.linspace(0, grid_size * (u_data.shape[0] - 1), u_data.shape[0])
